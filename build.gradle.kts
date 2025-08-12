@@ -38,7 +38,6 @@ java {
 }
 tasks {
     shadowJar {
-        archiveClassifier.set("")
         mapOf(
             "org.apache.commons" to "commons",
             "top.mrxiaom.pluginbase" to "base",
@@ -47,8 +46,14 @@ tasks {
             relocate(original, "$shadowGroup.$target")
         }
     }
-    build {
+    val copyTask = create<Copy>("copyBuildArtifact") {
         dependsOn(shadowJar)
+        from(shadowJar.get().outputs)
+        rename { "${project.name}-$version.jar" }
+        into(rootProject.file("out"))
+    }
+    build {
+        dependsOn(copyTask)
     }
     withType<JavaCompile>().configureEach {
         options.encoding = "UTF-8"
