@@ -53,51 +53,35 @@ public class SweetPlugin extends AbstractPluginHolder implements VoicechatPlugin
     }
 
     public void sendAudio(Player player, Asset asset) {
-        sendAudio(player, asset.data());
+        sendAudio(player, asset, false);
     }
 
     public void sendAudio(Player player, Asset asset, boolean stopCurrent) {
-        sendAudio(player, asset.data(), stopCurrent);
-    }
-
-    public void sendAudio(Player player, short[] audio) {
-        sendAudio(player, audio, false);
-    }
-
-    public void sendAudio(Player player, short[] audio, boolean stopCurrent) {
         VoicePlayer voicePlayer = getPlayer(player);
         if (voicePlayer.isConnected()) {
             if (stopCurrent) {
                 voicePlayer.stopCurrentAudio(true);
             }
             if (voicePlayer.canCreatePlayerNow()) {
-                AudioPlayer p = voicePlayer.createAudioPlayer(api.createEncoder(), audio);
+                AudioPlayer p = voicePlayer.createAudioPlayer(api.createEncoder(), asset);
                 p.startPlaying();
             }
         }
     }
 
     public void sendLoopAudio(Player player, Asset asset) {
-        sendLoopAudio(player, asset.data());
+        sendLoopAudio(player, asset, false);
     }
 
     public void sendLoopAudio(Player player, Asset asset, boolean stopCurrent) {
-        sendLoopAudio(player, asset.data(), stopCurrent);
-    }
-
-    public void sendLoopAudio(Player player, short[] audio) {
-        sendLoopAudio(player, audio, false);
-    }
-
-    public void sendLoopAudio(Player player, short[] audio, boolean stopCurrent) {
         VoicePlayer voicePlayer = getPlayer(player);
         if (voicePlayer.isConnected()) {
             if (stopCurrent) {
                 voicePlayer.stopCurrentAudio(true);
             }
             if (voicePlayer.canCreatePlayerNow()) {
-                AudioPlayer p = voicePlayer.createAudioPlayer(api.createEncoder(), audio);
-                p.setOnStopped(() -> sendLoopAudio(player, audio, stopCurrent));
+                AudioPlayer p = voicePlayer.createAudioPlayer(api.createEncoder(), asset);
+                p.setOnStopped(() -> sendLoopAudio(player, asset, stopCurrent));
                 p.startPlaying();
             }
         }

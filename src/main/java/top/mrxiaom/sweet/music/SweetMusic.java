@@ -2,6 +2,7 @@ package top.mrxiaom.sweet.music;
         
 import de.maxhenkel.voicechat.api.BukkitVoicechatService;
 import top.mrxiaom.pluginbase.BukkitPlugin;
+import top.mrxiaom.pluginbase.utils.PAPI;
 import top.mrxiaom.pluginbase.utils.scheduler.FoliaLibScheduler;
 import top.mrxiaom.sweet.music.voicechat.SweetPlugin;
 
@@ -35,6 +36,9 @@ public class SweetMusic extends BukkitPlugin {
 
     @Override
     protected void afterEnable() {
+        if (PAPI.isEnabled()) {
+            new Placeholders(this).register();
+        }
         getLogger().info("SweetMusic 加载完毕");
     }
 }

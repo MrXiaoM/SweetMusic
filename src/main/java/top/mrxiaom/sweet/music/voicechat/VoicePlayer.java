@@ -7,6 +7,7 @@ import de.maxhenkel.voicechat.api.audiochannel.AudioPlayer;
 import de.maxhenkel.voicechat.api.audiochannel.StaticAudioChannel;
 import de.maxhenkel.voicechat.api.opus.OpusEncoder;
 import org.bukkit.entity.Player;
+import top.mrxiaom.sweet.music.assets.Asset;
 
 import java.util.UUID;
 
@@ -17,6 +18,7 @@ public class VoicePlayer {
     private VoicechatConnection connection;
     private StaticAudioChannel channel;
     private AudioPlayer audioPlayer;
+    private Asset playingAsset;
     private String lastWorld;
     public VoicePlayer(VoicechatServerApi api, Player player) {
         this.api = api;
@@ -51,9 +53,14 @@ public class VoicePlayer {
         }
     }
 
-    public AudioPlayer createAudioPlayer(OpusEncoder encoder, short[] audio) {
-        this.audioPlayer = api.createAudioPlayer(getChannel(), encoder, audio);
+    public AudioPlayer createAudioPlayer(OpusEncoder encoder, Asset asset) {
+        this.playingAsset = asset;
+        this.audioPlayer = api.createAudioPlayer(getChannel(), encoder, asset.data());
         return this.audioPlayer;
+    }
+
+    public Asset getPlayingAsset() {
+        return isPlaying() ? playingAsset : null;
     }
 
     public boolean canCreatePlayerNow() {

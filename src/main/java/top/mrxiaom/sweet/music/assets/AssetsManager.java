@@ -3,16 +3,24 @@ package top.mrxiaom.sweet.music.assets;
 import org.apache.commons.io.monitor.FileAlterationListenerAdaptor;
 import org.apache.commons.io.monitor.FileAlterationMonitor;
 import org.apache.commons.io.monitor.FileAlterationObserver;
+import org.bukkit.Bukkit;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.configuration.MemoryConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import top.mrxiaom.pluginbase.func.AutoRegister;
 import top.mrxiaom.pluginbase.utils.Util;
 import top.mrxiaom.sweet.music.SweetMusic;
 import top.mrxiaom.sweet.music.func.AbstractModule;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 
 @AutoRegister
 public class AssetsManager extends AbstractModule {
@@ -50,10 +58,44 @@ public class AssetsManager extends AbstractModule {
         this.monitor.start();
     }
 
+    @Override
+    public void reloadConfig(MemoryConfiguration config) {
+        reloadConfig();
+    }
+
+    public void reloadConfig() {
+        File file = plugin.resolve("./assets.yml");
+        if (!file.exists()) {
+            plugin.saveResource("assets.yml", file);
+        }
+
+        for (Asset asset : assets.values()) {
+            asset.display(asset.key());
+        }
+
+        YamlConfiguration config = new YamlConfiguration();
+        config.options().pathSeparator('>');
+        try {
+            config.load(file);
+        } catch (FileNotFoundException ignored) {
+        } catch (IOException | InvalidConfigurationException ex) {
+            Bukkit.getLogger().log(Level.SEVERE, "Cannot load " + file, ex);
+        }
+
+        ConfigurationSection section = config.getConfigurationSection("assets");
+        if (section != null) for (String key : section.getKeys(false)) {
+            Asset asset = get(key);
+            if (asset != null) {
+                asset.display(section.getString(key + ">display", asset.key()));
+            }
+        }
+    }
+
     public void reloadAssets() {
         this.assets.clear();
         load(this.directory);
         this.hasApiLoaded = true;
+        reloadConfig();
     }
 
     private void load(File directory) {

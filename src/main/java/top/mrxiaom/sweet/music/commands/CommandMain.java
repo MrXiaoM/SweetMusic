@@ -54,7 +54,7 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
                 }
             }
             SweetPlugin.inst().sendAudio(target, asset, true);
-            return t(sender, "&a已执行播放&e " + args[1]);
+            return t(sender, "&a已执行播放&e " + asset.display());
         }
         if (args.length >= 1 && "stop".equalsIgnoreCase(args[0]) && sender.isOp()) {
             Player target;
@@ -92,7 +92,7 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
                 }
             }
             SweetPlugin.inst().sendLoopAudio(target, asset, true);
-            return t(sender, "&a已执行循环播放&e " + args[1]);
+            return t(sender, "&a已执行循环播放&e " + asset.display());
         }
         if (args.length == 1 && "reload".equalsIgnoreCase(args[0]) && sender.isOp()) {
             plugin.reloadConfig();

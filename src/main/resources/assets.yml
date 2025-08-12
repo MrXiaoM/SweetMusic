@@ -1,0 +1,6 @@
+# 音频文件额外配置
+assets:
+  # 音频文件名
+  example.wav:
+    # 音频展示名
+    display: '示例音频'
