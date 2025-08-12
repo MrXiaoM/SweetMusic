@@ -1,0 +1,13 @@
+name: SweetMusic
+version: '${version}'
+main: top.mrxiaom.sweet.music.SweetMusic
+api-version: 1.13
+depend:
+  - voicechat
+softdepend:
+  - PlaceholderAPI
+authors: [ MrXiaoM ]
+commands:
+  sweetmusic:
+    description: 'The main command of SweetMusic'
+    aliases: [ smusic, music ]
