@@ -188,6 +188,9 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
                 if ("play".equalsIgnoreCase(args[0]) || "loop".equalsIgnoreCase(args[0])) {
                     return startsWith(AssetsManager.inst().keys(), args[1]);
                 }
+                if ("stop".equalsIgnoreCase(args[0])) {
+                    return null;
+                }
                 if ("optional".equalsIgnoreCase(args[0])) {
                     return startsWith(listOptionalArg1, args[1]);
                 }
@@ -195,10 +198,20 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
         }
         if (args.length == 3) {
             if (sender.isOp()) {
+                if ("play".equalsIgnoreCase(args[0]) || "loop".equalsIgnoreCase(args[0])) {
+                    return null;
+                }
                 if ("optional".equalsIgnoreCase(args[0])) {
                     if ("play".equalsIgnoreCase(args[1]) || "loop".equalsIgnoreCase(args[1])) {
                         return startsWith(AssetsManager.inst().keys(), args[2]);
                     }
+                }
+            }
+        }
+        if (args.length == 4) {
+            if (sender.isOp()) {
+                if ("optional".equalsIgnoreCase(args[0]) && ("play".equalsIgnoreCase(args[1]) || "loop".equalsIgnoreCase(args[1]))) {
+                    return null;
                 }
             }
         }
