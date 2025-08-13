@@ -28,6 +28,13 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+        boolean silent = false;
+        for (String arg : args) {
+            if (arg.equals("-s") || arg.equals("--silent")) {
+                silent = true;
+                break;
+            }
+        }
         if (args.length == 1 && "list".equalsIgnoreCase(args[0]) && sender.isOp()) {
             t(sender, "&e资源列表如下:");
             for (String key : AssetsManager.inst().keys()) {
@@ -41,7 +48,7 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
                 return t(sender, "&c资源&e " + args[1] + " &c不存在");
             }
             Player target;
-            if (args.length == 3) {
+            if (args.length == 3 && !args[2].equals("-s") && !args[2].equals("--silent")) {
                 target = Util.getOnlinePlayer(args[2]).orElse(null);
                 if (target == null) {
                     return t(sender, "&e玩家不在线 (或不存在)");
@@ -54,11 +61,15 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
                 }
             }
             SweetPlugin.inst().sendAudio(target, asset, true);
-            return t(sender, "&a已执行播放&e " + asset.display());
+            if (silent) {
+                return true;
+            } else {
+                return t(sender, "&a已执行播放&e " + asset.display());
+            }
         }
         if (args.length >= 1 && "stop".equalsIgnoreCase(args[0]) && sender.isOp()) {
             Player target;
-            if (args.length == 2) {
+            if (args.length == 2 && !args[1].equals("-s") && !args[1].equals("--silent")) {
                 target = Util.getOnlinePlayer(args[1]).orElse(null);
                 if (target == null) {
                     return t(sender, "&e玩家不在线 (或不存在)");
@@ -71,7 +82,11 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
                 }
             }
             SweetPlugin.inst().getPlayer(target).stopCurrentAudio(true);
-            return t(sender, "&a已停止播放");
+            if (silent) {
+                return true;
+            } else {
+                return t(sender, "&a已停止播放");
+            }
         }
         if (args.length >= 2 && "loop".equalsIgnoreCase(args[0]) && sender.isOp()) {
             Asset asset = AssetsManager.inst().get(args[1]);
@@ -79,7 +94,7 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
                 return t(sender, "&c资源&e " + args[1] + " &c不存在");
             }
             Player target;
-            if (args.length == 3) {
+            if (args.length == 3 && !args[2].equals("-s") && !args[2].equals("--silent")) {
                 target = Util.getOnlinePlayer(args[2]).orElse(null);
                 if (target == null) {
                     return t(sender, "&e玩家不在线 (或不存在)");
@@ -92,7 +107,63 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
                 }
             }
             SweetPlugin.inst().sendLoopAudio(target, asset, true);
-            return t(sender, "&a已执行循环播放&e " + asset.display());
+            if (silent) {
+                return true;
+            } else {
+                return t(sender, "&a已执行循环播放&e " + asset.display());
+            }
+        }
+        if (args.length >= 3 && "optional".equalsIgnoreCase(args[0]) && sender.isOp()) {
+            if ("play".equalsIgnoreCase(args[1]) && sender.isOp()) {
+                Asset asset = AssetsManager.inst().get(args[2]);
+                if (asset == null) {
+                    return t(sender, "&c资源&e " + args[2] + " &c不存在");
+                }
+                Player target;
+                if (args.length == 4 && !args[3].equals("-s") && !args[3].equals("--silent")) {
+                    target = Util.getOnlinePlayer(args[3]).orElse(null);
+                    if (target == null) {
+                        return t(sender, "&e玩家不在线 (或不存在)");
+                    }
+                } else {
+                    if (sender instanceof Player) {
+                        target = (Player) sender;
+                    } else {
+                        return t(sender, "&c只有玩家才能执行该命令");
+                    }
+                }
+                SweetPlugin.inst().sendAudio(target, asset, false);
+                if (silent) {
+                    return true;
+                } else {
+                    return t(sender, "&a已执行播放&e " + asset.display());
+                }
+            }
+            if ("loop".equalsIgnoreCase(args[1]) && sender.isOp()) {
+                Asset asset = AssetsManager.inst().get(args[2]);
+                if (asset == null) {
+                    return t(sender, "&c资源&e " + args[2] + " &c不存在");
+                }
+                Player target;
+                if (args.length == 4 && !args[3].equals("-s") && !args[3].equals("--silent")) {
+                    target = Util.getOnlinePlayer(args[3]).orElse(null);
+                    if (target == null) {
+                        return t(sender, "&e玩家不在线 (或不存在)");
+                    }
+                } else {
+                    if (sender instanceof Player) {
+                        target = (Player) sender;
+                    } else {
+                        return t(sender, "&c只有玩家才能执行该命令");
+                    }
+                }
+                SweetPlugin.inst().sendLoopAudio(target, asset, false);
+                if (silent) {
+                    return true;
+                } else {
+                    return t(sender, "&a已执行循环播放&e " + asset.display());
+                }
+            }
         }
         if (args.length == 1 && "reload".equalsIgnoreCase(args[0]) && sender.isOp()) {
             plugin.reloadConfig();
@@ -103,7 +174,9 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
 
     private static final List<String> listArg0 = Lists.newArrayList();
     private static final List<String> listOpArg0 = Lists.newArrayList(
-            "list", "play", "stop", "loop", "reload");
+            "list", "play", "stop", "loop", "optional", "reload");
+    private static final List<String> listOptionalArg1 = Lists.newArrayList(
+            "play", "loop");
     @Nullable
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
@@ -114,6 +187,18 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
             if (sender.isOp()) {
                 if ("play".equalsIgnoreCase(args[0]) || "loop".equalsIgnoreCase(args[0])) {
                     return startsWith(AssetsManager.inst().keys(), args[1]);
+                }
+                if ("optional".equalsIgnoreCase(args[0])) {
+                    return startsWith(listOptionalArg1, args[1]);
+                }
+            }
+        }
+        if (args.length == 3) {
+            if (sender.isOp()) {
+                if ("optional".equalsIgnoreCase(args[0])) {
+                    if ("play".equalsIgnoreCase(args[1]) || "loop".equalsIgnoreCase(args[1])) {
+                        return startsWith(AssetsManager.inst().keys(), args[2]);
+                    }
                 }
             }
         }
