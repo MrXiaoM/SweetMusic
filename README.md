@@ -16,6 +16,13 @@ Minecraft 通过 [Simple Voice Chat](https://modrinth.com/plugin/simple-voice-ch
 > + 进入区域自动播放音乐，离开区域自动停止播放
 > + 多个玩家共享同一条音轨
 
+## 应用场景
+
++ 背景音乐播放（无需 Mod 的原版平替详见[这里](https://producer.mrxiaom.top/post/mc-custom-biome-music)）
++ 持续时间较长的环境音效播放（如果用原版方案，玩家移动时，会引起声场变化产生不适）
++ 模拟无线电语音配音播放（如果用原版方案，玩家移动时，声场不会随着玩家位置移动）
++ 需要随时可以播放/停止
+
 ## 命令
 
 根命令为 `/sweetmusic`，别名为 `/smusic`, `/music`。  
