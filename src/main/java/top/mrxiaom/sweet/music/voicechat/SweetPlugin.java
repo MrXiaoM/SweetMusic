@@ -14,14 +14,14 @@ import top.mrxiaom.sweet.music.assets.Asset;
 import top.mrxiaom.sweet.music.assets.AssetsManager;
 import top.mrxiaom.sweet.music.func.AbstractPluginHolder;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class SweetPlugin extends AbstractPluginHolder implements VoicechatPlugin, Listener {
     private VoicechatApi api;
     private VoicechatServerApi serverApi;
     private final Map<UUID, VoicePlayer> players = new HashMap<>();
+    private final List<Runnable> loadHooks = new ArrayList<>();
+    private boolean started = false;
     public SweetPlugin(SweetMusic plugin) {
         super(plugin, true);
         registerEvents();
@@ -100,6 +100,11 @@ public class SweetPlugin extends AbstractPluginHolder implements VoicechatPlugin
 
     private void onServerStarted(VoicechatServerStartedEvent event) {
         serverApi = event.getVoicechat();
+        started = true;
+        for (Runnable runnable : loadHooks) {
+            runnable.run();
+        }
+        loadHooks.clear();
     }
 
     @EventHandler
@@ -107,6 +112,14 @@ public class SweetPlugin extends AbstractPluginHolder implements VoicechatPlugin
         VoicePlayer remove = players.remove(e.getPlayer().getUniqueId());
         if (remove != null) {
             remove.dispose();
+        }
+    }
+
+    public void runAfterLoad(Runnable runnable) {
+        if (!started) {
+            loadHooks.add(runnable);
+        } else {
+            runnable.run();
         }
     }
 
