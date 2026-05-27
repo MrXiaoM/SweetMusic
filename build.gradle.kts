@@ -1,12 +1,21 @@
+import top.mrxiaom.gradle.LibraryHelper
+
 plugins {
     java
     `maven-publish`
-    id ("com.gradleup.shadow") version "8.3.0"
+    id ("com.gradleup.shadow") version "9.3.0"
 }
+
+buildscript {
+    repositories.mavenCentral()
+    dependencies.classpath("top.mrxiaom:LibrariesResolver-Gradle:1.7.23")
+}
+val base = LibraryHelper(project)
 
 group = "top.mrxiaom.sweet.music"
 version = "1.0.0"
 val targetJavaVersion = 8
+val pluginBaseModules = base.modules.run { listOf(library) }
 val shadowGroup = "top.mrxiaom.sweet.music.libs"
 
 repositories {
@@ -16,79 +25,35 @@ repositories {
     maven("https://repo.helpch.at/releases/")
     maven("https://jitpack.io")
     maven("https://repo.rosewooddev.io/repository/public/")
-    maven("https://maven.maxhenkel.de/repository/public/")
+    maven("https://maven.maxhenkel.de/repository/public/") // simple voice chat
 }
 
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.20-R0.1-SNAPSHOT")
-    // compileOnly("org.spigotmc:spigot:1.20") // NMS
+    compileOnly(base.depend.annotations)
 
-    compileOnly("me.clip:placeholderapi:2.11.6")
-    compileOnly("de.maxhenkel.voicechat:voicechat-api:2.5.36")
+    compileOnly("me.clip:placeholderapi:2.12.2")
+    compileOnly("de.maxhenkel.voicechat:voicechat-api:2.6.13")
 
     implementation("commons-io:commons-io:2.16.0")
     implementation("com.github.technicallycoded:FoliaLib:0.4.4") { isTransitive = false }
-    implementation("top.mrxiaom:PluginBase:1.5.8")
-}
-java {
-    val javaVersion = JavaVersion.toVersion(targetJavaVersion)
-    if (JavaVersion.current() < javaVersion) {
-        toolchain.languageVersion.set(JavaLanguageVersion.of(targetJavaVersion))
+    for (artifact in pluginBaseModules) {
+        implementation(artifact)
     }
-    withSourcesJar()
-    withJavadocJar()
 }
+
+LibraryHelper.initJava(project, base, targetJavaVersion, true)
+LibraryHelper.initPublishing(project)
+
 tasks {
     shadowJar {
+        configurations.add(project.configurations.runtimeClasspath.get())
         mapOf(
             "org.apache.commons" to "commons",
             "top.mrxiaom.pluginbase" to "base",
             "com.tcoded.folialib" to "folialib",
         ).forEach { (original, target) ->
             relocate(original, "$shadowGroup.$target")
-        }
-    }
-    val copyTask = create<Copy>("copyBuildArtifact") {
-        dependsOn(shadowJar)
-        from(shadowJar.get().outputs)
-        rename { "${project.name}-$version.jar" }
-        into(rootProject.file("out"))
-    }
-    build {
-        dependsOn(copyTask)
-    }
-    withType<JavaCompile>().configureEach {
-        options.encoding = "UTF-8"
-        if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible) {
-            options.release.set(targetJavaVersion)
-        }
-    }
-    javadoc {
-        (options as StandardJavadocDocletOptions).apply {
-            links("https://hub.spigotmc.org/javadocs/spigot/")
-
-            locale("zh_CN")
-            encoding("UTF-8")
-            docEncoding("UTF-8")
-            addBooleanOption("keywords", true)
-            addBooleanOption("Xdoclint:none", true)
-        }
-    }
-    processResources {
-        duplicatesStrategy = DuplicatesStrategy.INCLUDE
-        from(sourceSets.main.get().resources.srcDirs) {
-            expand(mapOf("version" to version))
-            include("plugin.yml")
-        }
-    }
-}
-publishing {
-    publications {
-        create<MavenPublication>("maven") {
-            from(components.getByName("java"))
-            groupId = project.group.toString()
-            artifactId = rootProject.name
-            version = project.version.toString()
         }
     }
 }

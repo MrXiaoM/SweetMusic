@@ -2,7 +2,7 @@ package top.mrxiaom.sweet.music;
         
 import de.maxhenkel.voicechat.api.BukkitVoicechatService;
 import top.mrxiaom.pluginbase.BukkitPlugin;
-import top.mrxiaom.pluginbase.utils.PAPI;
+import top.mrxiaom.pluginbase.utils.depend.PAPI;
 import top.mrxiaom.pluginbase.utils.scheduler.FoliaLibScheduler;
 import top.mrxiaom.sweet.music.voicechat.SweetPlugin;
 

@@ -37,7 +37,9 @@ public class VoicePlayer {
         String currentWorld = player.getWorld().getName();
         if (channel == null || !currentWorld.equals(lastWorld)) {
             lastWorld = currentWorld;
-            channel = api.createStaticAudioChannel(UUID.randomUUID(), serverPlayer.getServerLevel(), connection);
+            channel = api.createStaticAudioChannel(UUID.randomUUID());
+            if (channel == null) return null;
+            channel.addTarget(connection);
         }
         return channel;
     }
