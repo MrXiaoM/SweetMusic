@@ -8,14 +8,14 @@ plugins {
 
 buildscript {
     repositories.mavenCentral()
-    dependencies.classpath("top.mrxiaom:LibrariesResolver-Gradle:1.7.32")
+    dependencies.classpath("top.mrxiaom:LibrariesResolver-Gradle:1.8.1")
 }
 val base = LibraryHelper(project)
 
 group = "top.mrxiaom.sweet.music"
 version = "1.0.0"
 val targetJavaVersion = 8
-val pluginBaseModules = base.modules.run { listOf(library) }
+val pluginBaseModules = base.modules.run { listOf(library, message, misc) }
 val shadowGroup = "top.mrxiaom.sweet.music.libs"
 
 repositories {
@@ -33,10 +33,9 @@ dependencies {
     compileOnly(base.depend.annotations)
 
     compileOnly("me.clip:placeholderapi:2.12.2")
-    compileOnly("de.maxhenkel.voicechat:voicechat-api:2.6.13")
+    compileOnly("de.maxhenkel.voicechat:voicechat-api:2.6.20")
 
     implementation("commons-io:commons-io:2.16.0")
-    implementation("com.github.technicallycoded:FoliaLib:0.4.4") { isTransitive = false }
     for (artifact in pluginBaseModules) {
         implementation(artifact)
     }
@@ -51,7 +50,6 @@ tasks {
         mapOf(
             "org.apache.commons" to "commons",
             "top.mrxiaom.pluginbase" to "base",
-            "com.tcoded.folialib" to "folialib",
         ).forEach { (original, target) ->
             relocate(original, "$shadowGroup.$target")
         }

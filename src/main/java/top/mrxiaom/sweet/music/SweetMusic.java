@@ -3,7 +3,6 @@ package top.mrxiaom.sweet.music;
 import de.maxhenkel.voicechat.api.BukkitVoicechatService;
 import top.mrxiaom.pluginbase.BukkitPlugin;
 import top.mrxiaom.pluginbase.utils.depend.PAPI;
-import top.mrxiaom.pluginbase.utils.scheduler.FoliaLibScheduler;
 import top.mrxiaom.sweet.music.voicechat.SweetPlugin;
 
 public class SweetMusic extends BukkitPlugin {
@@ -19,7 +18,6 @@ public class SweetMusic extends BukkitPlugin {
                 .reconnectDatabaseWhenReloadConfig(false)
                 .scanIgnore("top.mrxiaom.sweet.music.libs")
         );
-        this.scheduler = new FoliaLibScheduler(this);
         if (System.getProperty("top.mrxiaom.sweet.music.loaded") != null) {
             throw new UnsupportedOperationException("由于需要依赖 voicechat 插件的生命周期，本插件不支持热重载");
         }
